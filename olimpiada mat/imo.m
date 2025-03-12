@@ -16,6 +16,7 @@ title('Number of Contestants through Years');
 % bar(years, df{:, 6}, 'FaceColor', 'r');
 
 y = [df{:, 5}, df{:, 6}];
+figure(2);
 bar(years, y, 1.4);
 xlabel('Year');
 ylabel('Number of Contestants');
@@ -24,7 +25,6 @@ legend('Male', 'Female','Location' ,'Northwest');
 
 
 y = df{:, 6} ./ df{:, 5};
-y
 figure(3);
 bar(years, y);
 xlabel('Year');
@@ -33,13 +33,16 @@ title('Percent of Female among participatns')
 
 
 figure(4);
-plot(years, df{:, 7} ./ df{:, 5});
+% Gold color: [1, 0.84, 0]
+plot(years, df{:, 7} ./ df{:, 5}, '-o', 'Color', [1, 0.84, 0], 'LineWidth', 1.3, 'MarkerSize', 2);
 hold on;
-plot(years, df{:, 8} ./ df{:, 5});
-hold on
-plot(years, df{:, 9} ./ df{:, 5});
+% Silver color: [0.75, 0.75, 0.75]
+plot(years, df{:, 8} ./ df{:, 5}, '-o', 'Color', [0.75, 0.75, 0.75], 'LineWidth', 1.3, 'MarkerSize', 2);
+% Bronze color: a custom choice ([0.8, 0.5, 0.2])
+plot(years, df{:, 9} ./ df{:, 5}, '-o', 'Color', [0.8, 0.5, 0.2], 'LineWidth', 1.3, 'MarkerSize', 2);
 xlabel('Year');
 ylabel('Percent of Participants');
-title('Number of Gold, Silver, Bronze Medals');
-legend('Silver', 'Gold', 'Bronze', 'Location', 'northeast');
-xlim(min(years), max(years)); % Set x-axis limits to the range of years
+title('Number of Gold, Silver, Bronze Medals through Years');
+legend('Gold', 'Silver', 'Bronze', 'Location', 'northeast');
+xlim([min(years) max(years)]);
+hold off;
