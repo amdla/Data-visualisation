@@ -1,7 +1,0 @@
-Reported Portfolio Investment Assets by Economy of Nonresident Issuer: Total Portfolio Investment
-This dataset contains information on portfolio investment assets from the United States to various specified countries. The data is presented in MILLIONS DOLLARS and reflects end-of-period amounts. U.S row is empty as data is on U.S investments to foreign countries.
-
-
-same grudnie cleaned:
-- wartosci podane na grudzień poszczegolnych lat
-- 0 = brak danych lub zero 
