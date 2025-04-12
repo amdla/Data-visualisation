@@ -1,3 +1,22 @@
+% Set global defaults for figures and axes
+set(0, 'DefaultAxesFontSize', 16, ...
+       'DefaultAxesXColor', 'w', ...            % White X axis
+       'DefaultAxesYColor', 'w', ...            % White Y axis
+       'DefaultAxesZColor', 'w', ...            % White Z axis (if needed)
+       'DefaultAxesGridColor', 'w', ...         % White grid lines
+       'DefaultAxesMinorGridColor', 'w')    % White minor grid lines
+% Figure background color
+set(0, 'DefaultFigureColor', [0.1 0.1 0.1]);    % Darker gray/black figure background
+
+
+
+
+
+
+
+
+
+
 df = readtable('Ranking of countries by Year.csv');
 
 
@@ -28,9 +47,9 @@ title('(1) Number of Contestants Through the Years');
 
 % FIGURE (2): LINE CHART COMPARING MALE vs. FEMALE
 figure(2);
-plot(years, maleContestants,  '-','LineWidth',2, 'DisplayName','Male');
+plot(years, maleContestants,  '-','LineWidth',4, 'DisplayName','Male');
 hold on;
-plot(years, femaleContestants,'-','LineWidth',2, 'DisplayName','Female');
+plot(years, femaleContestants,'-','LineWidth',4, 'DisplayName','Female');
 hold off;
 xlabel('Year');
 ylabel('Number of Contestants');
@@ -60,10 +79,10 @@ bronzeFrac = (bronzeCount ./ allContestants)*100;
 totalMedalFrac = goldFrac + silverFrac + bronzeFrac;
 
 subplot(2,1,1);
-plot(years, goldFrac,   '-','LineWidth',2, 'Color', [1 0.84 0], 'DisplayName','Gold');
+plot(years, goldFrac,   '-','LineWidth',4, 'Color', [1 0.84 0], 'DisplayName','Gold');
 hold on;
-plot(years, silverFrac, '-','LineWidth',2, 'Color', [0.75 0.75 0.75], 'DisplayName','Silver'); 
-plot(years, bronzeFrac, '-','LineWidth',2, 'Color', [0.8 0.5 0.2], 'DisplayName','Bronze')
+plot(years, silverFrac, '-','LineWidth',4, 'Color', [0.75 0.75 0.75], 'DisplayName','Silver'); 
+plot(years, bronzeFrac, '-','LineWidth',4, 'Color', [0.8 0.5 0.2], 'DisplayName','Bronze')
 hold off;
 xlabel('Year');
 ylabel('Percent of All Participants');
@@ -76,7 +95,7 @@ grid minor;
 
 % FIGURE (4b): TOTAL MEDALS EARNED (GOLD + SILVER + BRONZE)
 subplot(2,1,2);
-plot(years, totalMedalFrac, '-k','LineWidth',2,'DisplayName','Total Medals');
+plot(years, totalMedalFrac, '-k','LineWidth',4,'DisplayName','Total Medals');
 xlabel('Year');
 ylabel('Percent of All Participants');
 title('(4b) Percentage of Participants Earning Any Medal');
@@ -128,10 +147,10 @@ goldCutoffPct   = (goldCutoff   ./ df{:,11}) * 100;
 silverCutoffPct = (silverCutoff ./ df{:,11}) * 100;
 bronzeCutoffPct = (bronzeCutoff ./ df{:,11}) * 100;
 
-plot(years, goldCutoffPct,   '-','LineWidth',2, 'Color', [1 0.84 0], 'DisplayName','Gold Cutoff');   % Yellow
+plot(years, goldCutoffPct,   '-','LineWidth',4, 'Color', [1 0.84 0], 'DisplayName','Gold Cutoff');   % Yellow
 hold on;
-plot(years, silverCutoffPct, '-','LineWidth',2, 'Color', [0.75 0.75 0.75], 'DisplayName','Silver Cutoff'); % Silver/Grey
-plot(years, bronzeCutoffPct, '-','LineWidth',2, 'Color', [0.8 0.5 0.2], 'DisplayName','Bronze Cutoff'); % Bronze
+plot(years, silverCutoffPct, '-','LineWidth',4, 'Color', [0.75 0.75 0.75], 'DisplayName','Silver Cutoff'); % Silver/Grey
+plot(years, bronzeCutoffPct, '-','LineWidth',4, 'Color', [0.8 0.5 0.2], 'DisplayName','Bronze Cutoff'); % Bronze
 hold off;
 xlabel('Year');
 ylabel('Cutoff (%)');
