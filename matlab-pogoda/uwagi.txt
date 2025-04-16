@@ -1,0 +1,5 @@
+Heat Map ma przechylone delikatnie nazwy miesiąców
+
+Wykres z kołami ma stopnie, zamiast nazw miesiąców na obręczy i w okolicy 255 stopni jest coś dziwnego
+
+Trzeba by było dorobić jeszcze wykres z tymi jedno miast vs drugie miasto
