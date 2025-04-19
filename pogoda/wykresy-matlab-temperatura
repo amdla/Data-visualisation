@@ -1,0 +1,89 @@
+------ Wykres - mapa ciepła ------
+
+% Temperature data for each city and month
+temperatures = [30, 35, 45, 55, 65, 70, 75, 70, 60, 50, 40, 35;
+                50, 55, 60, 65, 70, 75, 80, 75, 70, 65, 60, 55;
+                50, 55, 65, 75, 85, 90, 95, 90, 85, 75, 65, 55;
+                40, 45, 55, 70, 85, 100, 105, 100, 90, 75, 60, 45];
+
+% Month and city names
+months = {'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'};
+cities = {'Chicago', 'San Diego', 'Houston', 'Death Valley'};
+
+% Define custom colormap from purple to yellow
+purple = [128/255, 0, 128/255];  % R, G, B for purple
+yellow = [1, 1, 0];              % R, G, B for yellow
+num_colors = 100;
+
+% Generate interpolated values for each color component
+r = linspace(purple(1), yellow(1), num_colors)';
+g = linspace(purple(2), yellow(2), num_colors)';
+b = linspace(purple(3), yellow(3), num_colors)';
+
+% Combine the interpolated components into a colormap matrix
+customColormap = [r, g, b];
+
+% Apply the custom colormap
+colormap(customColormap);
+
+% Plot the data using imagesc
+imagesc(temperatures)
+
+% Set axis labels
+set(gca, 'XTick', 1:12, 'XTickLabel', months);
+set(gca, 'YTick', 1:4, 'YTickLabel', cities);
+
+% Add colorbar for temperature scale
+c = colorbar;
+c.Label.String = 'Temperature (\circF)';
+c.Label.FontSize = 12;
+
+% Set color axis limits
+caxis([30, 105])
+
+% Adjust font size for axis labels
+set(gca, 'FontSize', 12);
+
+% Save the figure as an image file
+print('temperature_visualization.png', '-dpng')
+
+
+
+------ Wykres biegunowy --------------
+% Define months and their angles in degrees
+months = {'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'};
+month_angles = [270, 247.5, 225, 180, 135, 90, 45, 0, 315, 337.5, 285, 255];
+theta = deg2rad(month_angles);
+
+% Temperatures for each location
+death_valley_temps = [35, 38, 45, 55, 65, 75, 90, 85, 75, 60, 45, 35];
+houston_temps      = [45, 50, 55, 65, 70, 75, 80, 75, 70, 60, 50, 45];
+san_diego_temps    = [60, 62, 63, 65, 68, 70, 72, 70, 68, 65, 63, 60];
+chicago_temps      = [20, 25, 30, 40, 50, 60, 70, 65, 55, 40, 30, 20];
+
+% Colors for each location as RGB triplets:
+% Death Valley: Orange, Houston: Light Blue, San Diego: Dark Green, Chicago: Magenta
+colors = {[1, 0.5, 0], [0.68, 0.85, 0.9], [0, 0.5, 0], [1, 0, 1]};
+
+% Create figure and a polar axes
+figure;
+pax = polaraxes;
+hold(pax, 'on');
+
+% Plot each location's temperatures using polarplot
+polarplot(pax, theta, death_valley_temps, 'Color', colors{1}, 'LineWidth', 2);
+polarplot(pax, theta, houston_temps,      'Color', colors{2}, 'LineWidth', 2);
+polarplot(pax, theta, san_diego_temps,    'Color', colors{3}, 'LineWidth', 2);
+polarplot(pax, theta, chicago_temps,      'Color', colors{4}, 'LineWidth', 2);
+
+% Set the radial axis limits and ticks
+pax.RLim = [0 100];
+pax.RTick = 0:30:90;
+pax.RTickLabel = string(0:30:90);
+
+% Add title and legend
+title(pax, 'Temperature vs Date');
+legend(pax, 'Death Valley', 'Houston', 'San Diego', 'Chicago', 'Location', 'best');
+
+hold(pax, 'off');
+
