@@ -1,0 +1,132 @@
+```{r}
+setwd("C:/Users/macie/PycharmProjects/Data-visualisation/ksiazki") 
+library(tidyverse)
+library(lubridate)
+library(hexbin)
+library(RColorBrewer)
+
+# Load and clean data
+
+df <- read_csv("books_cleaned.csv") %>% 
+drop_na() %>% 
+clean_names()
+show_col_types = FALSE
+# Set common theme elements
+theme_set(theme_minimal(base_size = 14) + theme
+  (
+    plot.title = element_text(size = 20, face = "bold", hjust = 0.5, margin = margin(b = 30)),
+    panel.grid.major = element_line(color = "gray90", linetype = "dashed"),
+    text = element_text(color = "white"),
+    axis.title = element_text(size = 16, color = "white"),
+    axis.text = element_text(size = 14, color = "white"),
+    legend.text = element_text(color = "white"),
+    legend.title = element_text(color = "white"),
+    strip.text = element_text(color = "white")
+  ))
+
+save_and_show <- function(p, filename = "plot.png") {
+  ggsave(filename, plot = p, width = 10, height = 6, dpi = 300)
+  shell.exec(filename)  # Windows-only: opens the PNG
+}
+```
+
+```{r}
+# 1. Rating Distribution Histogram
+p1 <- ggplot(df, aes(average_rating)) +
+  geom_histogram(bins = 20, fill = "#1F77B4", color = "white") +
+  geom_text(stat = "bin", bins = 20, aes(label = after_stat(count)),
+            vjust = -0.5, size = 5, fontface = "bold") +
+  scale_x_continuous(limits = c(0, 5)) +
+  labs(x = "Average Rating", y = "Frequency",
+       title = "Distribution of Book Ratings with Counts") +
+  theme(plot.margin = margin(30, 20, 20, 20))
+
+
+
+save_and_show(p1, "ratings_plot.png")
+```
+
+
+```{r}
+# 2. Top Publishers Horizontal Bar
+top_publishers <- df %>% 
+  count(publisher) %>% 
+  slice_max(n, n = 10) %>% 
+  mutate(publisher = fct_reorder(publisher, n))
+
+p2 <- ggplot(top_publishers, aes(n, publisher)) +
+  geom_col(fill = "#1F77B4", width = 0.8) +
+  geom_text(aes(label = n), hjust = -0.2, size = 5, fontface = "bold") +
+  labs(x = "Number of Books", y = NULL,
+       title = "Top 10 Publishers by Number of Books Published") +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.1)))
+
+save_and_show(p2, "ratings_plot.png")
+```
+```{r}
+# 3. Page Count Histogram
+p3 <- df %>% 
+  filter(num_pages <= 1000) %>% 
+  ggplot(aes(num_pages)) +
+  geom_histogram(binwidth = 50, fill = "#2CA02C", color = "white") +
+  geom_text(stat = "bin", binwidth = 50, aes(label = after_stat(count)),
+            vjust = -0.5, size = 5, fontface = "bold") +
+  scale_x_continuous(breaks = seq(0, 1000, 100)) +
+  labs(x = "Number of Pages", y = "Count",
+       title = "Book Length Distribution (≤ 1000 Pages)")
+
+save_and_show(p3, "ratings_plot.png")
+```
+```{r}
+# 4. Publications Over Time Area Chart
+p4 <- df %>% 
+  mutate(year = year(parse_date_time(publication_date, orders = c("mdy", "ymd")))) %>% 
+  drop_na(year) %>% 
+  filter(between(year, 1950, 2020)) %>% 
+  count(year) %>% 
+  ggplot(aes(year, n)) +
+  geom_area(fill = "#9467BD", alpha = 0.4) +
+  geom_line(color = "#9467BD", linewidth = 1) +
+  scale_x_continuous(breaks = seq(1950, 2020, 5)) +
+  labs(x = "Publication Year", y = "Books Published",
+       title = "Book Publications Over Time (Valid Dates Only)")
+save_and_show(p4, "ratings_plot.png")
+```
+```{r}
+# 5. Page Count vs Rating Hexbin
+p5 <- df %>% 
+  filter(between(average_rating, 3, 5),
+         num_pages <= 1400) %>% 
+  ggplot(aes(num_pages, average_rating)) +
+  geom_hex(bins = 40) +
+  scale_fill_gradientn(colors = rev(brewer.pal(9, "YlOrRd"))) +
+  coord_cartesian(xlim = c(0, 1400), ylim = c(3, 5)) +
+  labs(x = "Number of Pages", y = "Average Rating (3-5)",
+       title = "Page Count vs Rating Density (Ratings 3-5)")
+save_and_show(p5, "ratings_plot.png")
+```  
+
+
+```{r}
+# 6. Year-Rating Heatmap
+heatmap_data <- df %>% 
+  mutate(year = year(parse_date_time(publication_date, orders = c("mdy", "ymd"))) %>% 
+  filter(between(year, 1994, 2010),
+         between(average_rating, 3, 4.5)) %>% 
+  mutate(rating_bin = cut(average_rating, 
+                          breaks = seq(3, 4.6, 0.1),
+                          right = FALSE)) %>% 
+  count(year, rating_bin) %>% 
+  complete(year = 1994:2010, rating_bin, fill = list(n = 0))
+
+p6 <- ggplot(heatmap_data, aes(rating_bin, factor(year))) +
+  geom_tile(aes(fill = n), color = "white") +
+  geom_text(aes(label = n), color = "black", size = 4, fontface = "bold") +
+  scale_fill_gradientn(colors = brewer.pal(9, "YlOrRd")) +
+  scale_x_discrete(labels = ~ sprintf("%.1f", as.numeric(sub("\\(.*", "", .x))))) +
+  labs(x = "Average Rating (0.1 increments)", y = "Publication Year",
+       title = "Book Distribution by Year and Rating (1994-2010, 3.0-4.5)") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+save_and_show(p6, "ratings_plot.png")
+```
