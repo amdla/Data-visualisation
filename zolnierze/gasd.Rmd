@@ -1,0 +1,161 @@
+```{r}
+setwd("C:/Users/macie/PycharmProjects/Data-visualisation/zolnierze")
+
+library(tidyverse)
+library(lubridate)
+library(RColorBrewer)
+library(janitor)
+library(dplyr)
+
+# Load and clean data
+df <- read_csv("baza_danych_renamed.csv", show_col_types = FALSE)
+
+
+theme_set(
+  theme_minimal(base_size = 14) + 
+  theme(
+    plot.title = element_text(size = 20, face = "bold", hjust = 0.5, margin = margin(b = 20)),
+    panel.grid.major = element_line(color = "gray90", linetype = "dotted", linewidth = 0.2),  # Dotted major grid
+    panel.grid.minor = element_line(color = "gray90", linetype = "dotted", linewidth = 0.2),  # Dotted minor grid
+    text = element_text(color = "white"),
+    axis.title = element_text(size = 16, color = "white"),
+    axis.text = element_text(size = 14, color = "white"),
+    legend.text = element_text(color = "white"),
+    legend.title = element_text(color = "white"),
+    strip.text = element_text(color = "white"),
+    plot.background = element_rect(fill = "black"),
+    panel.background = element_rect(fill = "black")
+  )
+)
+
+
+save_and_show <- function(p, filename = "plot.png") {
+  ggsave(filename, plot = p, width = 11, height = 7, dpi = 300)
+  shell.exec(filename)  # Windows-only: opens the PNG
+}
+```
+
+```{r}
+
+p1_data <- df %>%
+  filter(!is.na(`Nazwa formacji`)) %>%
+  count(`Nazwa formacji`, sort = TRUE) %>%
+  slice_max(n, n = 10) %>%
+  mutate(`Nazwa formacji` = str_wrap(`Nazwa formacji`, width = 25))
+
+p1 <- p1_data %>%
+  ggplot(aes(x = reorder(`Nazwa formacji`, n), y = n)) +
+  geom_col(fill = "steelblue") +
+  geom_text(aes(label = n), hjust = -0.1, color = "white", size = 5) +
+  coord_flip(clip = "off") +
+  labs(title = "10 formacji do których najczęściej należeli żołnierze", x = "Formacja", y = "Liczba żołnierzy") +
+  expand_limits(y = max(p1_data$n))
+
+
+
+save_and_show(p1, "p1.png")
+```
+
+
+```{r}
+p2 <- df %>%
+  filter(!is.na(`Miejsce pochówku`)) %>%
+  count(`Miejsce pochówku`, sort = TRUE) %>%
+  slice_max(n, n = 10) %>%
+  ggplot(aes(x = reorder(`Miejsce pochówku`, n), y = n)) +
+  geom_col(fill = "forestgreen") +
+  geom_text(aes(label = n), hjust = -0.1, color = "white", size = 5) +
+  coord_flip() +
+  labs(title = "10 najczęstszych miejsc pochówku", x = "Miejsce", y = "Liczba żołnierzy") +
+  expand_limits(y = max(df$n, na.rm = TRUE) * 1.2)
+
+save_and_show(p2, "p2.png")
+```
+
+
+```{r}
+p3 <- df %>%
+  filter(!is.na(`Miejsce zgonu`)) %>%
+  count(`Miejsce zgonu`, sort = TRUE) %>%
+  slice_max(n, n = 10) %>%
+  ggplot(aes(x = reorder(`Miejsce zgonu`, n), y = n)) +
+  geom_col(fill = "forestgreen") +
+  geom_text(aes(label = n), hjust = -0.1, color = "white", size = 5) +
+  coord_flip() +
+  labs(title = "10 najczęstszych miejsc zgonu", x = "Miejsce", y = "Liczba przypadków") +
+  expand_limits(y = max(df$n, na.rm = TRUE) * 1.2)
+
+save_and_show(p3, "p3.png")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+# Wymagane pakiety
+library(ggalluvial)
+library(treemapify)
+
+# Heatmap - zgony w podziale na miesiące i lata
+p4_data <- df %>%
+  mutate(
+    year = substr(`Data zgonu`, 1, 4),
+    month = substr(`Data zgonu`, 6, 7)
+  ) %>%
+  filter(!is.na(year), year != "", !is.na(month), month != "") %>%
+  count(year, month) %>%
+  mutate(
+    year = as.numeric(year),
+    month = factor(month.abb[as.numeric(month)], levels = month.abb)
+  )
+
+p4 <- ggplot(p4_data, aes(x = year, y = month, fill = n)) +
+  geom_tile(color = "white", size = 0.3) +
+  scale_fill_gradientn(colors = brewer.pal(9, "Blues")) +
+  labs(title = "Liczba zgonów w poszczególnych miesiącach i latach",
+       x = "Rok", y = "Miesiąc") +
+  scale_x_continuous(breaks = seq(min(p4_data$year, na.rm = TRUE), 
+                                max(p4_data$year, na.rm = TRUE), by = 2))
+
+save_and_show(p4, "p4.png")
+
+
+```
+
+```{r}
+# Trendy czasowe dla głównych formacji
+top_formacje <- df %>%
+  filter(!is.na(`Nazwa formacji`)) %>%
+  count(`Nazwa formacji`) %>%
+  slice_max(n, n = 5) %>%
+  pull(`Nazwa formacji`)
+p5_data <- df %>%
+  mutate(year = substr(`Data zgonu`, 1, 4)) %>%
+  filter(`Nazwa formacji` %in% top_formacje, !is.na(year), year != "") %>%
+  count(year, `Nazwa formacji`)
+
+p5 <- ggplot(p5_data, aes(x = year, y = n, group = `Nazwa formacji`, color = `Nazwa formacji`)) +
+  geom_line(size = 1.5) +
+  geom_point(size = 3) +
+  labs(title = "Trendy zgonów w czasie dla głównych formacji",
+       x = "Rok", y = "Liczba zgonów") +
+  theme(legend.position = "bottom")
+save_and_show(p5, "p5.png")
+
+```
+
+                         
