@@ -2,7 +2,7 @@ library(dplyr)
 library(ggplot2)
 library(readr)
 
-data <- read_csv("Renewable_energy.csv")  # Replace with your actual file path
+data <- read_csv("Renewable_energy.csv")
 
 data <- data %>%
   mutate(Technology = ifelse(Technology == "Hydropower (excl. Pumped Storage)", "Hydropower", Technology))
@@ -33,7 +33,6 @@ p_generation <- ggplot(tech_summary_generation, aes(x = reorder(Technology, Tota
   theme_minimal() +
   theme(
     plot.title = element_text(hjust = 0.5)
-    # Axis text remains horizontal by default
   ) +
   scale_fill_brewer(palette = "Set2")
 
@@ -58,7 +57,7 @@ p_installed <- ggplot(tech_summary_installed, aes(x = reorder(Technology, Total_
   theme(
     plot.title = element_text(hjust = 0.5)
   ) +
-  scale_fill_brewer(palette = "Set2")  # Same palette as the generation plot
+  scale_fill_brewer(palette = "Set2")
 
 png(filename = "Electricity_Installed_Capacity_Adv.png", width = 2400, height = 1600, res = 300)
 print(p_installed)
